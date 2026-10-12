@@ -1,4 +1,4 @@
-opkeeper website creation
+shopkeeper website creation
 Copilot Chat
 Single-page shopkeeper website creation
 Create a complete single page shopkeeper website with the following 
@@ -236,10 +236,10 @@ const products = [
   },
   {
     id: 20,
-    name: 'Electric Screwdriver',
+    name: 'Screwdriver',
     price: 499,
     rating: 4.8,
-    description: 'Cordless electric screwdriver with multiple bits.',
+    description:  screwdriver with multiple bits.',
     image: 'https://i.ibb.co/GfQ0vSf8/IMG-20260914-151216145.jpg'
   },
   {
