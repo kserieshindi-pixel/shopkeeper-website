@@ -1,4 +1,5 @@
 
+
 const products = [
   {
     id: 1,
@@ -168,15 +169,7 @@ const products = [
     description: 'Colorful disco LED bulb for parties and ambiance.',
     image: 'https://i.ibb.co/7JycJmLr/IMG-20260914-153025589.jpg'
   }
-  {
-  id: 22,
-  name: 'Home Decore Ganesh ji',
-  price: 699,
-  rating: 4.8,
-  description: 'Beautiful round shape Ganesha idol for home decor.',
-  image: https://i.ibb.co/HDk0JZwR/Screenshot-20261012-145807-Files-by-Google.png
-},
-
+  
 ];
 
 const cart = [];
