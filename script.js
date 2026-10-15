@@ -197,6 +197,10 @@ function getCartTotal() {
   return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 }
 
+function getOrderTotal() {
+  return getCartTotal();
+}
+
 function renderProducts() {
   productsCarousel.innerHTML = products.map((product) => `
     <article class="product-card" aria-label="${product.name}">
@@ -274,7 +278,7 @@ function updateCart() {
   });
 
   const subtotal = getCartTotal();
-  const tax = subtotal * 0.18;
+  const tax = 0;
   const total = subtotal + tax;
 
   subtotalEl.textContent = formatPrice(subtotal);
@@ -298,8 +302,9 @@ function openRazorpayWithCustomer(customer = {}) {
     return;
   }
 
-  const tax = Number((subtotal * 0.18).toFixed(2));
-  const amountPaise = Math.round((subtotal + tax) * 100);
+  const tax = 0;
+  const total = subtotal + tax;
+  const amountPaise = Math.round(total * 100);
 
   const options = {
     key: 'rzp_test_ToIYRn9AGYATrV',
@@ -320,7 +325,7 @@ function openRazorpayWithCustomer(customer = {}) {
         `Payment ID: ${response.razorpay_payment_id}\n\n` +
         `Customer: ${customer.name}\nPhone: ${customer.phone}\nEmail: ${customer.email}\n\n` +
         `Items:\n${itemList}\n\n` +
-        `Total: ${formatPrice(subtotal + tax)}`
+        `Total: ${formatPrice(total)}`
       );
 
       window.location.href = `mailto:gd299231@gmail.com?subject=${mailSubject}&body=${mailBody}`;
