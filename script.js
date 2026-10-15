@@ -1,5 +1,3 @@
-
-
 const products = [
   {
     id: 1,
@@ -140,7 +138,7 @@ const products = [
   {
     id: 18,
     name: 'Heat Sleeve',
-    price: 749,
+    price: 349,
     rating: 4.6,
     description: 'Heat shrink tubing for wire protection.',
     image: 'https://i.ibb.co/KghVQD1/IMG-20260914-151146683-HDR.jpg'
@@ -169,7 +167,6 @@ const products = [
     description: 'Colorful disco LED bulb for parties and ambiance.',
     image: 'https://i.ibb.co/7JycJmLr/IMG-20260914-153025589.jpg'
   }
-  
 ];
 
 const cart = [];
@@ -190,9 +187,14 @@ const checkoutBtn = document.getElementById('checkoutBtn');
 const checkoutForm = document.getElementById('checkoutForm');
 const menuToggle = document.getElementById('menuToggle');
 const navMenu = document.getElementById('navMenu');
+const razorpayBtn = document.getElementById('razorpayBtn');
 
 function formatPrice(value) {
   return `₹${value.toLocaleString('en-IN')}`;
+}
+
+function getCartTotal() {
+  return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 }
 
 function renderProducts() {
@@ -232,6 +234,7 @@ function addToCart(productId) {
   }
 
   updateCart();
+  openModal(cartModal);
 }
 
 function removeFromCart(productId) {
@@ -270,7 +273,7 @@ function updateCart() {
     button.addEventListener('click', () => removeFromCart(Number(button.dataset.id)));
   });
 
-  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const subtotal = getCartTotal();
   const tax = subtotal * 0.18;
   const total = subtotal + tax;
 
@@ -281,15 +284,59 @@ function updateCart() {
 }
 
 function openModal(modal) {
-  modal.classList.add('open');
+  if (modal) modal.classList.add('open');
 }
 
 function closeModal(modal) {
-  modal.classList.remove('open');
+  if (modal) modal.classList.remove('open');
+}
+
+function openRazorpay() {
+  const subtotal = getCartTotal();
+  if (subtotal <= 0) {
+    alert('Your cart is empty. Please add products first.');
+    return;
+  }
+
+  const tax = subtotal * 0.18;
+  const amountPaise = Math.round((subtotal + tax) * 100);
+
+  const options = {
+    key: 'rzp_test_ToIYRn9AGYATrV',
+    amount: amountPaise,
+    currency: 'INR',
+    name: 'Vasundhara Electronics',
+    description: 'Order Payment',
+    prefill: {
+      name: document.getElementById('customerName')?.value || '',
+      email: document.getElementById('customerEmail')?.value || '',
+      contact: document.getElementById('customerPhone')?.value || ''
+    },
+    theme: { color: '#F97316' },
+    handler: function (response) {
+      const itemList = cart.map((item) => `- ${item.name} x ${item.quantity} = ${formatPrice(item.price * item.quantity)}`).join('\n');
+      const mailSubject = encodeURIComponent('Paid Order - Vasundhara Electronics');
+      const mailBody = encodeURIComponent(
+        `Payment ID: ${response.razorpay_payment_id}\n\n` +
+        `Items:\n${itemList}\n\n` +
+        `Total: ${formatPrice(subtotal + tax)}`
+      );
+
+      window.location.href = `mailto:gd299231@gmail.com?subject=${mailSubject}&body=${mailBody}`;
+      setTimeout(() => {
+        cart.length = 0;
+        updateCart();
+      }, 400);
+    }
+  };
+
+  const razorpay = new Razorpay(options);
+  razorpay.open();
 }
 
 cartBtn.addEventListener('click', () => openModal(cartModal));
 closeCart.addEventListener('click', () => closeModal(cartModal));
+
 checkoutBtn.addEventListener('click', () => {
   if (cart.length === 0) {
     alert('Your cart is empty. Please add products before checkout.');
@@ -298,6 +345,7 @@ checkoutBtn.addEventListener('click', () => {
   closeModal(cartModal);
   openModal(checkoutModal);
 });
+
 closeCheckout.addEventListener('click', () => closeModal(checkoutModal));
 
 checkoutForm.addEventListener('submit', (event) => {
@@ -315,7 +363,7 @@ checkoutForm.addEventListener('submit', (event) => {
     return;
   }
 
-  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const subtotal = getCartTotal();
   const tax = subtotal * 0.18;
   const total = subtotal + tax;
 
@@ -347,9 +395,13 @@ checkoutForm.addEventListener('submit', (event) => {
     cart.length = 0;
     closeModal(checkoutModal);
     updateCart();
-    alert('Thank you for your order! Order details have been sent to our email. We will contact you soon to confirm.');
+    alert('Thank you for your order! Order details have been sent to our email.');
   }, 500);
 });
+
+if (razorpayBtn) {
+  razorpayBtn.addEventListener('click', openRazorpay);
+}
 
 menuToggle.addEventListener('click', () => {
   navMenu.classList.toggle('open');
@@ -363,17 +415,6 @@ window.addEventListener('click', (event) => {
   if (event.target === cartModal) closeModal(cartModal);
   if (event.target === checkoutModal) closeModal(checkoutModal);
 });
-const razorpayBtn = document.getElementById('razorpayBtn');
-razorpayBtn.addEventListener('click', () => {
-  const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
-  const rzp = new Razorpay({
-    key: 'rzp_test_ToIYRn9AGYATrV',
-    amount: total * 100,
-    currency: 'INR',
-    name: 'Vasundhara Electronics'
-  });
-  rzp.open();
-});
-// Initialize
+
 renderProducts();
 updateCart();
