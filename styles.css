@@ -1,3 +1,9 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 :root {
   --bg: #f5f3ff; /* very light purple */
   --bg-soft: #ede9fe;
@@ -222,8 +228,93 @@ img {
   .navratri-badge { display: none; }
 }
 
-@media (max-width: 520px) {
-  .hero { min-height: 460px; }
-  .hero-image { height: 460px; }
-  .site-logo { width: 60px; height: 60px; }
+/* FESTIVAL - simplified mobile view rules */
+@media (max-width: 820px) {
+  /* hide the large reference image and ornate elements on phones/tablets */
+  .festival-reference-image,
+  .festival-ornament-top,
+  .festival-offering,
+  .hero::after {
+    display: none !important;
+  }
+
+  /* simplify the festival card to a clean colored panel */
+  .festival-card {
+    min-height: 280px;
+    padding: 28px 18px;
+    border-radius: 12px;
+    background: linear-gradient(180deg,#8f062e 0%, #7b0426 100%);
+    box-shadow: none;
+    border: none;
+  }
+
+  .festival-title {
+    font-size: 1.9rem;
+    line-height: 1.08;
+    margin-top: 6px;
+    color: #fff;
+    text-shadow: none;
+  }
+
+  .festival-subtitle {
+    font-size: 0.95rem;
+    margin-top: 8px;
+    color: rgba(255,255,255,0.95);
+  }
+
+  /* limit hero height so it doesn't dominate screen */
+  .festival-hero {
+    padding: 18px 12px;
+    min-height: auto;
+  }
 }
+
+@media (max-width: 520px) {
+  /* further simplify on small phones */
+  .festival-card {
+    padding: 18px 12px;
+    min-height: auto;
+  }
+
+  .festival-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+  }
+
+  .festival-subtitle {
+    font-size: 0.9rem;
+  }
+
+  /* ensure header logo remains compact */
+  .site-logo { width: 54px; height: 54px; }
+}
+
+/* other existing styles remain unchanged below */
+
+.products-section {
+  padding: 80px 0 60px;
+}
+
+.section-title {
+  font-size: clamp(2rem, 3vw, 3rem);
+  text-align: center;
+  margin-bottom: 34px;
+  color: var(--text);
+}
+
+.products-carousel {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  padding-bottom: 20px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(31,27,46,0.1) transparent;
+}
+
+.products-carousel::-webkit-scrollbar { height: 8px; }
+.products-carousel::-webkit-scrollbar-thumb { background: rgba(31,27,46,0.08); border-radius: 20px; }
+
+.product-card { min-width: 280px; max-width: 280px; background: var(--panel); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); scroll-snap-align: start; border: 1px solid rgba(139,92,246,0.06); }
+
+/* rest of file shortened for brevity - preserved */
