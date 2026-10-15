@@ -189,6 +189,11 @@ const menuToggle = document.getElementById('menuToggle');
 const navMenu = document.getElementById('navMenu');
 const razorpayBtn = document.getElementById('razorpayBtn');
 
+// product modal elements
+const productModal = document.getElementById('productModal');
+const closeProduct = document.getElementById('closeProduct');
+const productDetail = document.getElementById('productDetail');
+
 function formatPrice(value) {
   return `₹${value.toLocaleString('en-IN')}`;
 }
@@ -222,19 +227,24 @@ function renderProducts() {
   `).join('');
 
   document.querySelectorAll('.product-btn').forEach((button) => {
-    button.addEventListener('click', () => addToCart(Number(button.dataset.id)));
+    button.addEventListener('click', (e) => {
+      // prevent triggering card click handler when button clicked
+      e.stopPropagation();
+      addToCart(Number(button.dataset.id));
+    });
   });
 }
 
-function addToCart(productId) {
+/* Modified addToCart to accept quantity (default 1) */
+function addToCart(productId, qty = 1) {
   const product = products.find((item) => item.id === productId);
   if (!product) return;
 
   const existingItem = cart.find((item) => item.id === productId);
   if (existingItem) {
-    existingItem.quantity += 1;
+    existingItem.quantity += qty;
   } else {
-    cart.push({ ...product, quantity: 1 });
+    cart.push({ ...product, quantity: qty });
   }
 
   updateCart();
@@ -264,17 +274,34 @@ function updateCart() {
 
   cartItemsContainer.innerHTML = cart.map((item) => `
     <div class="cart-item">
-      <div>
-        <h4>${item.name}</h4>
-        <span class="qty">Qty: ${item.quantity}</span>
+      <div style="display:flex; gap:12px; align-items:center;">
+        <img src="${item.image}" alt="${item.name}" style="width:64px; height:64px; object-fit:cover; border-radius:8px;"/>
+        <div>
+          <h4 style="margin:0 0 6px;">${item.name}</h4>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button class="qty-btn" data-id="${item.id}" data-action="decrease">-</button>
+            <span class="qty">${item.quantity}</span>
+            <button class="qty-btn" data-id="${item.id}" data-action="increase">+</button>
+          </div>
+        </div>
       </div>
-      <span class="price">${formatPrice(item.price * item.quantity)}</span>
-      <button class="remove-item" data-id="${item.id}">Remove</button>
+      <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+        <span class="price">${formatPrice(item.price * item.quantity)}</span>
+        <button class="remove-item" data-id="${item.id}">Remove</button>
+      </div>
     </div>
   `).join('');
 
   document.querySelectorAll('.remove-item').forEach((button) => {
     button.addEventListener('click', () => removeFromCart(Number(button.dataset.id)));
+  });
+
+  document.querySelectorAll('.qty-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const id = Number(btn.dataset.id);
+      const action = btn.dataset.action;
+      changeQuantity(id, action === 'increase' ? 1 : -1);
+    });
   });
 
   const subtotal = getCartTotal();
@@ -287,12 +314,100 @@ function updateCart() {
   finalTotalEl.textContent = formatPrice(total);
 }
 
+function changeQuantity(productId, delta) {
+  const item = cart.find((i) => i.id === productId);
+  if (!item) return;
+  item.quantity += delta;
+  if (item.quantity <= 0) {
+    removeFromCart(productId);
+    return;
+  }
+  updateCart();
+}
+
 function openModal(modal) {
   if (modal) modal.classList.add('open');
 }
 
 function closeModal(modal) {
   if (modal) modal.classList.remove('open');
+}
+
+/* Open product detail modal */
+function openProductModal(productId) {
+  const product = products.find(p => p.id === productId);
+  if (!product) return;
+
+  productDetail.innerHTML = `
+    <div style="display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap;">
+      <div style="flex:0 0 320px; max-width:320px;">
+        <img src="${product.image}" alt="${product.name}" style="width:100%; border-radius:12px; object-fit:cover;">
+      </div>
+      <div style="flex:1; min-width:220px;">
+        <h3 id="productTitle" style="margin-top:0">${product.name}</h3>
+        <p style="color:var(--muted)">${product.description}</p>
+        <p style="font-weight:800; font-size:1.25rem; margin:12px 0; color:var(--primary-dark)">${formatPrice(product.price)}</p>
+
+        <div style="display:flex; gap:8px; align-items:center; margin-bottom:12px;">
+          <label style="font-weight:600">Quantity:</label>
+          <button id="pd-decrease" class="qty-btn">-</button>
+          <span id="pd-qty">1</span>
+          <button id="pd-increase" class="qty-btn">+</button>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:8px;">
+          <button id="pd-add" class="shop-btn">Add to cart</button>
+          <button id="pd-buy" class="checkout-btn">Buy Now</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // quantity controls
+  let pdQty = 1;
+  const qtyEl = productDetail.querySelector('#pd-qty');
+  productDetail.querySelector('#pd-decrease').addEventListener('click', () => {
+    if (pdQty > 1) { pdQty--; qtyEl.textContent = pdQty; }
+  });
+  productDetail.querySelector('#pd-increase').addEventListener('click', () => {
+    pdQty++; qtyEl.textContent = pdQty;
+  });
+
+  // Add to cart from modal
+  productDetail.querySelector('#pd-add').addEventListener('click', () => {
+    addToCart(productId, pdQty);
+    closeModal(productModal);
+    openModal(cartModal);
+  });
+
+  // Buy now -> add and open checkout
+  productDetail.querySelector('#pd-buy').addEventListener('click', () => {
+    addToCart(productId, pdQty);
+    closeModal(productModal);
+    closeModal(cartModal);
+    openModal(checkoutModal);
+  });
+
+  openModal(productModal);
+  // scroll modal to top
+  const modalContent = productModal.querySelector('.modal-content');
+  if (modalContent) modalContent.scrollTop = 0;
+}
+
+if (closeProduct) closeProduct.addEventListener('click', () => closeModal(productModal));
+
+/* Attach click handler to product cards so clicking the card (not the internal button) opens modal */
+function attachProductCardHandlers() {
+  document.querySelectorAll('.product-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      // ignore if clicked on a button or link inside the card (so Add to cart still works)
+      if (e.target.closest('button') || e.target.closest('a')) return;
+      const btn = card.querySelector('.product-btn');
+      if (!btn) return;
+      const id = Number(btn.dataset.id);
+      openProductModal(id);
+    });
+  });
 }
 
 function openRazorpayWithCustomer(customer = {}) {
@@ -401,7 +516,10 @@ navMenu.querySelectorAll('a').forEach((link) => {
 window.addEventListener('click', (event) => {
   if (event.target === cartModal) closeModal(cartModal);
   if (event.target === checkoutModal) closeModal(checkoutModal);
+  if (event.target === productModal) closeModal(productModal);
 });
 
+// initial render and handlers
 renderProducts();
+attachProductCardHandlers();
 updateCart();
