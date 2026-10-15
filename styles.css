@@ -281,10 +281,11 @@ img {
   overflow-y: auto;
   padding: 12px;
   scrollbar-width: thin;
-  scrollbar-color: rgba(31,27,46,0.12) transparent;
+  scrollbar-color: rgba(31,27,46,0.08) transparent;
 }
-.products-carousel::-webkit-scrollbar { width: 10px; }
-.products-carousel::-webkit-scrollbar-thumb { background: rgba(31,27,46,0.09); border-radius: 10px; }
+.products-carousel::-webkit-scrollbar { width: 8px; height: 8px; }
+.products-carousel::-webkit-scrollbar-thumb { background: rgba(31,27,46,0.08); border-radius: 10px; }
+.products-carousel::-webkit-scrollbar-track { background: transparent; }
 
 /* Ensure product cards fill the grid cell */
 .products-carousel .product-card {
