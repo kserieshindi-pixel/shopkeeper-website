@@ -363,7 +363,17 @@ window.addEventListener('click', (event) => {
   if (event.target === cartModal) closeModal(cartModal);
   if (event.target === checkoutModal) closeModal(checkoutModal);
 });
-
+const razorpayBtn = document.getElementById('razorpayBtn');
+razorpayBtn.addEventListener('click', () => {
+  const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+  const rzp = new Razorpay({
+    key: 'rzp_test_ToIYRn9AGYATrV',
+    amount: total * 100,
+    currency: 'INR',
+    name: 'Vasundhara Electronics'
+  });
+  rzp.open();
+});
 // Initialize
 renderProducts();
 updateCart();
