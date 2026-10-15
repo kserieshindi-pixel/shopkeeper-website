@@ -291,14 +291,14 @@ function closeModal(modal) {
   if (modal) modal.classList.remove('open');
 }
 
-function openRazorpay() {
+function openRazorpayWithCustomer(customer = {}) {
   const subtotal = getCartTotal();
   if (subtotal <= 0) {
     alert('Your cart is empty. Please add products first.');
     return;
   }
 
-  const tax = subtotal * 0.18;
+  const tax = Number((subtotal * 0.18).toFixed(2));
   const amountPaise = Math.round((subtotal + tax) * 100);
 
   const options = {
@@ -308,9 +308,9 @@ function openRazorpay() {
     name: 'Vasundhara Electronics',
     description: 'Order Payment',
     prefill: {
-      name: document.getElementById('customerName')?.value || '',
-      email: document.getElementById('customerEmail')?.value || '',
-      contact: document.getElementById('customerPhone')?.value || ''
+      name: customer.name || '',
+      email: customer.email || '',
+      contact: customer.phone || ''
     },
     theme: { color: '#F97316' },
     handler: function (response) {
@@ -318,13 +318,16 @@ function openRazorpay() {
       const mailSubject = encodeURIComponent('Paid Order - Vasundhara Electronics');
       const mailBody = encodeURIComponent(
         `Payment ID: ${response.razorpay_payment_id}\n\n` +
+        `Customer: ${customer.name}\nPhone: ${customer.phone}\nEmail: ${customer.email}\n\n` +
         `Items:\n${itemList}\n\n` +
         `Total: ${formatPrice(subtotal + tax)}`
       );
 
       window.location.href = `mailto:gd299231@gmail.com?subject=${mailSubject}&body=${mailBody}`;
       setTimeout(() => {
+        checkoutForm.reset();
         cart.length = 0;
+        closeModal(checkoutModal);
         updateCart();
       }, 400);
     }
@@ -363,44 +366,23 @@ checkoutForm.addEventListener('submit', (event) => {
     return;
   }
 
-  const subtotal = getCartTotal();
-  const tax = subtotal * 0.18;
-  const total = subtotal + tax;
-
-  const itemList = cart.map((item) => `- ${item.name} x ${item.quantity} = ${formatPrice(item.price * item.quantity)}`).join('\n');
-
-  const mailSubject = encodeURIComponent('New Order from Vasundhara Electronics');
-  const mailBody = encodeURIComponent(
-    `Hello Vasundhara Electronics,\n\n` +
-    `New Order Received!\n\n` +
-    `=== CUSTOMER DETAILS ===\n` +
-    `Name: ${customerName}\n` +
-    `Phone: ${customerPhone}\n` +
-    `Email: ${customerEmail}\n` +
-    `Address: ${customerAddress}\n` +
-    `City: ${customerCity}\n` +
-    `Postal Code: ${customerZip}\n\n` +
-    `=== ORDER ITEMS ===\n${itemList}\n\n` +
-    `=== ORDER TOTAL ===\n` +
-    `Subtotal: ${formatPrice(subtotal)}\n` +
-    `Tax (18%): ${formatPrice(tax)}\n` +
-    `Total Amount: ${formatPrice(total)}\n\n` +
-    `Please confirm this order at your earliest convenience.`
-  );
-
-  window.location.href = `mailto:gd299231@gmail.com?subject=${mailSubject}&body=${mailBody}`;
-
-  setTimeout(() => {
-    checkoutForm.reset();
-    cart.length = 0;
-    closeModal(checkoutModal);
-    updateCart();
-    alert('Thank you for your order! Order details have been sent to our email.');
-  }, 500);
+  closeModal(checkoutModal);
+  openRazorpayWithCustomer({
+    name: customerName,
+    phone: customerPhone,
+    email: customerEmail
+  });
 });
 
 if (razorpayBtn) {
-  razorpayBtn.addEventListener('click', openRazorpay);
+  razorpayBtn.addEventListener('click', () => {
+    if (cart.length === 0) {
+      alert('Your cart is empty. Please add products first.');
+      return;
+    }
+    closeModal(cartModal);
+    openModal(checkoutModal);
+  });
 }
 
 menuToggle.addEventListener('click', () => {
