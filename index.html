@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vasundhara Electronics - Navratri Special</title>
+    <title>Vasundhara Electronics - Fresh Finds Best Prices</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -15,13 +15,12 @@
     <header class="header">
         <div class="header-container">
             <div class="logo">
-                <img src="assets/Print.svg" class="site-logo" alt="Vasundhara Electronics logo">
+                <i class="fas fa-plug"></i>
                 <div>
                     <h1>Vasundhara Electronics</h1>
-                    <p>Navratri Special — Fresh Finds Best Prices</p>
+                    <p>Fresh Finds Best Prices</p>
                 </div>
             </div>
-            <div class="navratri-badge">Navratri Special</div>
             <button class="menu-toggle" id="menuToggle">
                 <span></span>
                 <span></span>
@@ -44,25 +43,13 @@
         <i class="fab fa-whatsapp"></i>
     </a>
 
-    <!-- Festival hero (sample image) -->
-    <section class="hero festival-hero" id="home">
-        <div class="festival-card">
-            <div class="festival-ornament festival-ornament-top" aria-hidden="true"></div>
-
-            <div class="festival-art" aria-hidden="true">
-                <img src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1600&q=80" alt="Navratri Special Banner" class="festival-reference-image">
-            </div>
-
-            <h2 class="festival-title">Happy <span>Navratri</span></h2>
-            <p class="festival-subtitle">
-                Wishing you a joyful and blessed Navratri, May Maa Durga bless you and your family with happiness
-            </p>
-
-            <div class="festival-offering" aria-hidden="true">
-                <div class="aarti-left"></div>
-                <div class="lotus"></div>
-                <div class="aarti-right"></div>
-            </div>
+    <section class="hero" id="home">
+        <img src="https://i.ibb.co/PGBHSqS/premium-photo-1683141052679-942eb9e77760.jpg" alt="Electronics Banner" class="hero-image">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h2 class="hero-title">Premium Electronics at Unbeatable Prices</h2>
+            <p class="hero-subtitle">Discover the Latest Gadgets & Technology</p>
+            <button class="shop-btn" onclick="document.getElementById('products').scrollIntoView({behavior: 'smooth'})">Shop Now</button>
         </div>
     </section>
 
@@ -82,7 +69,7 @@
             </div>
             <div class="cart-summary">
                 <div class="summary-row"><span>Subtotal:</span><span id="subtotal">₹0</span></div>
-                <div class="summary-row"><span>Tax (Included):</span><span id="tax">₹0</span></div>
+                <div class="summary-row"><span>Tax (18%):</span><span id="tax">₹0</span></div>
                 <div class="summary-row total"><span>Total:</span><span id="total">₹0</span></div>
             </div>
             <button class="checkout-btn" id="checkoutBtn">Cash on Delivery</button>
